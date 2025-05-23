@@ -25,17 +25,9 @@ cd ticket-reservation-api
 docker-compose up -d
 ```
 
-The API will be ready at `http://localhost:3000` in about 30 seconds (wait for DB initialization).
-
 ## Verification Steps
 
-### 1. Check System Health
-```bash
-curl http://localhost:3000/health
-```
-*Should return `{"status":"OK"}`*
-
-### 2. Test Ticket Booking
+### 1. Test Ticket Booking
 ```bash
 curl -X POST http://localhost:3000/api/v1/tickets/book \
 -H "Content-Type: application/json" \
