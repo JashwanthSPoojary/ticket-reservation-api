@@ -21,7 +21,7 @@ Key features implemented:
 ```bash
 # Clone and run with Docker (includes automatic DB setup)
 git clone https://github.com/JashwanthSPoojary/ticket-reservation-api.git
-cd railway-reservation-api
+cd ticket-reservation-api
 docker-compose up -d
 ```
 
