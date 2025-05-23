@@ -9,6 +9,7 @@ import { CreateTicketDto } from "../dtos/create-ticket.dto";
 
 export class TicketRepository implements ITicketRepository {
   async create(ticketData: CreateTicketDto): Promise<TicketResponseDto> {
+    
     return await prisma.$transaction(async (tx:any) => {
       // Create ticket
       const ticket = await tx.ticket.create({
