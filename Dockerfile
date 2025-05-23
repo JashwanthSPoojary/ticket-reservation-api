@@ -1,6 +1,5 @@
 FROM node:18-alpine
 
-# Install dependencies including postgresql-client
 RUN apk add --no-cache openssl postgresql-client
 
 WORKDIR /app
@@ -11,7 +10,6 @@ RUN npx prisma generate
 
 COPY . .
 
-# Replace the init script with a Node.js version
 COPY scripts/wait-for-db.js ./scripts/wait-for-db.js
 
 RUN npm run build
