@@ -27,7 +27,20 @@ docker-compose up -d
 
 ## Verification Steps
 
-### 1. Test Ticket Booking
+### 1. Check Initial Availability
+```bash
+curl http://localhost:3000/api/v1/tickets/available
+```
+*Expected Response:*
+```json
+{
+  "confirmed": 63,
+  "rac": 18,
+  "waiting": 10
+}
+```
+
+### 2. Test Ticket Booking
 ```bash
 curl -X POST http://localhost:3000/api/v1/tickets/book \
 -H "Content-Type: application/json" \
@@ -37,11 +50,47 @@ curl -X POST http://localhost:3000/api/v1/tickets/book \
   ]
 }'
 ```
-*Verify:*
-- Returns ticket details with status "CONFIRMED"
-- Check available tickets decrease: `curl http://localhost:3000/api/v1/tickets/available`
 
-### 3. Test Cancellation Flow
+### 3. Verify Booked Tickets
+```bash
+curl http://localhost:3000/api/v1/tickets/booked
+```
+*Expected Response:*
+```json
+[
+  {
+    "id": 1,
+    "pnrNumber": "PNRABC123",
+    "bookingStatus": "CONFIRMED",
+    "passengers": [
+      {
+        "id": 1,
+        "name": "Test Passenger",
+        "age": 30,
+        "gender": "MALE",
+        "isChild": false
+      }
+    ],
+    "createdAt": "2023-05-15T10:00:00.000Z",
+    "updatedAt": "2023-05-15T10:00:00.000Z"
+  }
+]
+```
+
+### 4. Verify Updated Availability
+```bash
+curl http://localhost:3000/api/v1/tickets/available
+```
+*Expected Response (counts decreased by 1):*
+```json
+{
+  "confirmed": 62,
+  "rac": 18,
+  "waiting": 10
+}
+```
+
+### 5. Test Cancellation Flow
 ```bash
 # Book first
 TICKET_ID=$(curl -s -X POST http://localhost:3000/api/v1/tickets/book \
@@ -51,11 +100,17 @@ TICKET_ID=$(curl -s -X POST http://localhost:3000/api/v1/tickets/book \
 # Then cancel
 curl -X POST http://localhost:3000/api/v1/tickets/cancel/$TICKET_ID
 ```
-*Verify:*
-- Returns success message
-- Available tickets should increase back
 
-### 4. Test Edge Cases
+### 6. Verify Post-Cancellation State
+```bash
+# Check booked tickets (should be empty or reduced)
+curl http://localhost:3000/api/v1/tickets/booked
+
+# Check availability (should increase back)
+curl http://localhost:3000/api/v1/tickets/available
+```
+
+### 7. Test Edge Cases
 ```bash
 # Invalid data
 curl -X POST http://localhost:3000/api/v1/tickets/book \
@@ -69,7 +124,6 @@ for i in {1..100}; do
   -d '{"passengers": [{"name": "Passenger '$i'", "age": 25, "gender": "MALE"}]}'
 done
 ```
-*Verify proper error handling*
 
 ## Implementation Highlights
 
