@@ -1,0 +1,83 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum BookingStatus {
+  CONFIRMED
+  RAC
+  WAITING
+}
+
+enum BerthType {
+  LOWER
+  MIDDLE
+  UPPER
+  SIDE_LOWER
+}
+
+model Passenger {
+  id              Int               @id @default(autoincrement())
+  name            String
+  age             Int
+  gender          String
+  isChild         Boolean           @default(false)
+  ticket          Ticket?           @relation(fields: [ticketId], references: [id])
+  ticketId        Int?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  BerthAllocation BerthAllocation[]
+}
+
+model Ticket {
+  id               Int               @id @default(autoincrement())
+  pnrNumber        String            @unique
+  bookingStatus    BookingStatus
+  passengers       Passenger[]
+  berthAllocations BerthAllocation[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+}
+
+model Berth {
+  id          Int               @id @default(autoincrement())
+  number      String            @unique
+  type        BerthType
+  coach       String
+  allocations BerthAllocation[]
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+}
+
+model BerthAllocation {
+  id          Int           @id @default(autoincrement())
+  ticket      Ticket        @relation(fields: [ticketId], references: [id])
+  ticketId    Int
+  passenger   Passenger     @relation(fields: [passengerId], references: [id])
+  passengerId Int
+  berth       Berth?        @relation(fields: [berthId], references: [id])
+  berthId     Int?
+  status      BookingStatus
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model SystemCounter {
+  id                 Int      @id @default(autoincrement())
+  confirmedAvailable Int      @default(63)
+  racAvailable       Int      @default(18)
+  waitingAvailable   Int      @default(10)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
