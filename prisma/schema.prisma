@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -62,7 +61,7 @@ model Berth {
 
 model BerthAllocation {
   id          Int           @id @default(autoincrement())
-  ticket      Ticket        @relation(fields: [ticketId], references: [id])
+  ticket      Ticket        @relation(fields: [ticketId], references: [id], onDelete: Cascade)
   ticketId    Int
   passenger   Passenger     @relation(fields: [passengerId], references: [id])
   passengerId Int
@@ -72,6 +71,7 @@ model BerthAllocation {
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 }
+
 
 model SystemCounter {
   id                 Int      @id @default(autoincrement())
